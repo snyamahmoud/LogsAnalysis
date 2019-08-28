@@ -6,7 +6,7 @@ A- What are the most popular three articles of all time?
    
  	 3- Bad things gone, say good people           --> 170098 views
    
- B- Who are the most popular article authors of all time?
+  B- Who are the most popular article authors of all time?
  
  	 . Ursula La Multa       --  507594 views
  	 . Rudolf von Treppenwitz  -- 423457 views
