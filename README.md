@@ -1,6 +1,6 @@
 # Project-Logs-Analysis
 
-=> project one
+First Project -Nanodegree UDACITY
 
 
 # to Run:
