@@ -1,6 +1,6 @@
 # Project-Logs-Analysis
 
-First Project -Nanodegree UDACITY
+First Project -Nanodegree Udacity
 
 
 # to Run:
