@@ -3,30 +3,30 @@
 => project one
 
 
-to Run:
+# to Run:
 
 You will need:
 
-1.Python3
+1. Python3
 
-2.VirtualBox
+2. VirtualBox
 
-3.Vagrant
+3. Vagrant
 
 
-Setup
+# Setup
 
 Install Vagrant And VirtualBox
 
 Clone this repository
 
-To Run
+# To Run
 
 Launch Vagrant VM by running vagrant up, you can the log in with vagrant ssh
 
 To load the data, use the command psql -d news -f newsdata.sql to connect a database and run the necessary SQL statements.
 
-The database includes three tables:
+# The database includes three tables:
 
 1- Authors table
 
