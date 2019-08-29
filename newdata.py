@@ -1,59 +1,56 @@
 import psycopg2
 
-def get_query_results(query):
-    """Execute given query and return results"""
 
-    db, cursor = connect_db()
-    cursor.execute(query)
-    results = cursor.fetchall()
-    db.close()
-    return results
+def main():
+    # Connect to an existing database
+    conn = psycopg2.connect("dbname=news")
 
+    # Open a cursor to perform database operations
+    cur = conn.cursor()
 
-def connect_db(name="news"):
-    """Connect to the database and returns its connection"""
-    try:
-        db = psycopg2.connect("dbname={}".format(name))
-        cursor = db.cursor()
-        return db, cursor
-    except:
-        print "Error while connecting to the database"
-        sys.exit(1)
+    # Question 1
+    sql_popular_articles = """
+      SELECT article_view.title, article_view.view
+      FROM article_view
+      ORDER BY article_view.view DESC
+      LIMIT 3;
+    """
+    cur.execute(sql_popular_articles)
+    print("Most popular articles:")
+    for (title, view) in cur.fetchall():
+        print("    {} - {} views".format(title, view))
+    print("-" * 70)
 
+    # Question 2
+    sql_popular_authors = """
+    SELECT article_view.name, SUM(article_view.view) AS author_view
+    FROM article_view
+    GROUP BY article_view.name
+    ORDER BY author_view DESC;
+    """
+    cur.execute(sql_popular_authors)
+    print("Most popular authors:")
+    for (name, view) in cur.fetchall():
+        print("    {} - {} views".format(name, view))
+    print("-" * 70)
 
-def most_popular_articles():
-    """Print the most popular three articles of all time"""
+    # Question 3
+    sql_more_than_one_percent_errors = """
+    SELECT *
+    FROM error_rate
+    WHERE error_rate.percentage > 1
+    ORDER BY error_rate.percentage DESC;
+    """
+    cur.execute(sql_more_than_one_percent_errors)
+    print("Days with more than 1% errors:")
+    for (date, percentage) in cur.fetchall():
+        print("    {} - {}% errors".format(date, percentage))
+    print("-" * 70)
 
-    query = "SELECT * FROM popular_articles LIMIT 3"
-    results = get_query_results(query)
+    # Close communication with the database
+    cur.close()
+    conn.close()
 
-    print "\nWhat are the most popular three articles of all time?"
-    for result in results:
-        print "\"" + result[0] + "\" -- " + str(result[1]) + " views"
-
-
-def most_popular_authors():
-    """Print the most popular authors of all time"""
-
-    query = "SELECT * FROM popular_authors"
-    results = get_query_results(query)
-
-    print "\nWho are the most popular article authors of all time?"
-    for result in results:
-        print "\"" + result[0] + "\" -- " + str(result[1]) + " views"
-
-
-def error_requests():
-    """Print on which days did more than 1% of requests lead to errors"""
-
-    query = "SELECT * FROM requests_error_log WHERE error_percentage > 1"
-    results = get_query_results(query)
-
-    print "\nOn which days did more than 1% of requests lead to errors?"
-    for result in results:
-        print "\"" + str(result[0]) + "\" -- " + str(result[1]) + "% errors"
-
-if __name__ == '__main__':
-    most_popular_articles()
-    most_popular_authors()
-    error_requests()
+if __name__ == "__main__":
+    main()
+© 2019 GitHub, Inc.
