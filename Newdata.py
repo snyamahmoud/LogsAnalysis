@@ -1,6 +1,5 @@
 import psycopg2
 
-import pycodestyle
 
 # 1. What are the most popular three articles of all time?
 
