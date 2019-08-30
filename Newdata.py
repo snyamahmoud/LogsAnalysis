@@ -1,6 +1,35 @@
+#!/usr/bin/env python
+
 import psycopg2
 
 
+
+
+def get_query_results(query):
+    """Execute given query and return results"""
+
+    db, cursor = connect_db()
+    cursor.execute(query)
+    results = cursor.fetchall()
+    db.close()
+    return results
+   
+   
+   
+
+def connect_db(name="news"):
+    """Connect to the database and returns its connection"""
+    try:
+        db = psycopg2.connect("dbname={}".format(name))
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print "Error while connecting to the database"
+        sys.exit(1)
+       
+       
+       
+       
 # 1. What are the most popular three articles of all time?
 
  query = """
