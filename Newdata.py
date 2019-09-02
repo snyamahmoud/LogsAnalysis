@@ -1,96 +1,80 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
 import psycopg2
 
 
+1. What are the most popular three articles of all time?
+
+query_1_title = ("What are the most popular three articles of all time?")
+query_1 = (
+    "select articles.title, count(*) as views "
+    "from articles inner join log on log.path "
+    "like concat('%', articles.slug, '%') "
+    "where log.status like '%200%' group by "
+    "articles.title, log.path order by views desc limit 3")
 
 
-def get_query_results(query):
-    """Execute given query and return results"""
+2. Who are the most popular article authors of all time?
 
-    db, cursor = connect_db()
-    cursor.execute(query)
-    results = cursor.fetchall()
-    db.close()
-    return results
-   
-   
-   
+query_2_title = ("Who are the most popular article authors of all time?")
+query_2 = (
+    "select authors.name, count(*) as views from articles inner "
+    "join authors on articles.author = authors.id inner join log "
+    "on log.path like concat('%', articles.slug, '%') where "
+    "log.status like '%200%' group "
+    "by authors.name order by views desc")
 
-def connect_db(name="news"):
-    """Connect to the database and returns its connection"""
+3. On which days did more than 1% of requests lead to errors
+
+query_3_title = ("On which days did more than 1% of requests lead to errors?")
+query_3 = (
+    "select day, perc from ("
+    "select day, round((sum(requests)/(select count(*) from log where "
+    "substring(cast(log.time as text), 0, 11) = day) * 100), 2) as "
+    "perc from (select substring(cast(log.time as text), 0, 11) as day, "
+    "count(*) as requests from log where status like '%404%' group by day)"
+    "as log_percentage group by day order by perc desc) as final_query "
+    "where perc >= 1")
+
+
+def connect(database_name="news"):
+    """Connect to the PostgreSQL database. Returns a database connection """
     try:
-        db = psycopg2.connect("dbname={}".format(name))
+        db = psycopg2.connect("dbname={}".format(database_name))
         cursor = db.cursor()
         return db, cursor
     except:
-        print "Error while connecting to the database"
-        sys.exit(1)
-       
-       
-       
-       
-# 1. What are the most popular three articles of all time?
-
- query = """
-    select title, count(*) as views from articles, log
-    where log.path like concat('%', articles.slug)
-    and log.status like '%200%'
-    group by articles.title
-    order by views desc limit 3;
-    """
-    results = get_query(query)
-
-    print("\nThe top 3 articles viewed are:")
-    for i, r in enumerate(results):
-        title = r[0]
-        views = str(r[1]) + " views"
-        print(str(i+1) + ": " + title + " -- " + views)
-
-# Who are the most popular authors of all time?
-
-authorsQuery = ''' select authors.name as Author, count(*) as Views
-             from log,articles,authors
-             where log.path=CONCAT('/article/',articles.slug)
-             AND articles.author = authors.id
-             Group By authors.name
-             order by views DESC '''
-# Place the articles query within a function whichc will later be called
+        print ("Unable to connect to the database")
 
 
-def print_query2(query):
-    results = get_query(query)
-    print('\nQ2.Most Popular Authors:\n')
-    for j in results:
-        print ('\t' + str(j[0]) + ' - ' + str(j[1]) + ' views')
-        
-# 3. On which days did more than 1% of requests lead to errors?
-
-errorQuery = ''' select date, (fail * 1.0/ total) * 100 FailurePercentage
-                FROM (SELECT cast(time as date) date,
-                count(*) as total, SUM(CASE status when '404 NOT FOUND'
-                then 1 else 0 END) as fail
-                FROM log group by date) as notfail
-                where ((fail * 1.0/ total) * 1.0) * 100 > 1 '''
-# Place the articles query within a function whichc will later be called
+def get_query_results(query):
+    """Return query results for given query """
+    db, cursor = connect()
+    cursor.execute(query)
+    return cursor.fetchall()
+    db.close()
 
 
-def print_query3(query):
-    results = get_query(query)
-    print('\nQ3.error days:\n')
-    for k in results:
-        print ('\t' + str(k[0]) + ' - ' + str(k[1]) + ' %')
-# establish connection to makeshift psql instance
+def print_query_results(query_results):
+    print (query_results[1])
+    for index, results in enumerate(query_results[0]):
+        print (
+            "\t", index+1, "-", results[0],
+            "\t - ", str(results[1]), "views")
 
 
-def get_query(query):
-    '''Connect to news db'''
-    db = psycopg2.connect("dbname=news")
-    c = db.cursor()
-    c.execute(query)
-    return c.fetchall()
-# print out results
+def print_error_results(query_results):
+    print (query_results[1])
+    for results in query_results[0]:
+        print ("\t", results[0], "-", str(results[1]) + "% errors")
 
-print_query1(articlesQuery)
-print_query2(authorsQuery)
-print_query3(errorQuery)
+
+if __name__ == '__main__':
+    # store query results
+    popular_articles_results = get_query_results(query_1), query_1_title
+    popular_authors_results = get_query_results(query_2), query_2_title
+    load_error_days = get_query_results(query_3), query_3_title
+
+    # print query results
+    print_query_results(popular_articles_results)
+    print_query_results(popular_authors_results)
+    print_error_results(load_error_days)
