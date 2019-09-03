@@ -1,7 +1,9 @@
 # Project-Logs-Analysis
 
-First Project -Nanodegree Udacity
+# About
 
+First Project Udacity Full Stack Nanodegree. In this project, I built complex SQL queries to draw conclusions for the given data.
+The project discoveres what kind of articles the readers on the site like, as well as errors that have happened.
 
 # to Run:
 
