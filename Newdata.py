@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
+
 import psycopg2
 
 import pycodestyle
 
 # 1. What are the most popular three articles of all time?
 
- query = """
-    select title, count(*) as views from articles, log
+ query ="""select title, count(*) as views from articles, log
     where log.path like concat('%', articles.slug)
     and log.status like '%200%'
     group by articles.title
