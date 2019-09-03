@@ -15,7 +15,7 @@ A- What are the most popular three articles of all time?
    
  	 3- Anonymous Contributor  -- 170098 views
    
-   4- Markoff Chaney    -- 84557 views
+         4- Markoff Chaney    -- 84557 views
 
    
 C- On which days did more than 1% of requests lead to errors?
